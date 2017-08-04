@@ -1,0 +1,12 @@
+@* list Template File *@
+
+@(products: Collection[String])
+
+@import tags._
+@import common._
+@main("Products site") {
+    @productsIterator(products)
+}
+
+
+

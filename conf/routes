@@ -1,0 +1,32 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# An example controller showing a sample home page
+GET     /                           controllers.HomeController.index
+# An example controller showing how to use dependency injection
+GET     /count                      controllers.CountController.count
+GET     /showGrid                   controllers.CountController.showGrid()
+# An example controller showing how to write asynchronous code
+GET     /message                    controllers.AsyncController.message
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /images/*file               controllers.Assets.at(path="/public/images", file)
+
+GET     /products/                  controllers.Products.list()
+GET     /products/new               controllers.Products.newProduct()
+GET     /products/:ean              controllers.Products.show(ean: Long)
+GET     /listProducts               controllers.CountController.listProducts()
+
+
+
+POST    /upload                     controllers.HomeController.upload()
+POST    /receiveData                controllers.HomeController.receiveData()
+POST    /receiveDataDB              controllers.HomeController.receiveDataDB()
+POST    /convert                    controllers.HomeController.convert()
+
+POST    /products/                  controllers.Products.save()
+
+#GET		/showClient/:id			    controllers.CountController.showClient(id : Long)
+#GET		/createClients				controllers.CountController.createClients(count : Long ?= 0)

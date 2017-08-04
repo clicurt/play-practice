@@ -1,0 +1,285 @@
+@* showGrid Template File *@
+@import common._
+
+@main("Welcome to Play") {
+<script type="text/javascript">
+
+        $(function(){
+            showGrid();
+            showTree();
+        });
+
+        function showGrid() {
+            jQuery("#list4").jqGrid({
+            datatype: "local",
+            height: 250,
+            colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes'],
+            colModel:[
+                {name:'id',index:'id', width:60, sorttype:"int"},
+                {name:'invdate',index:'invdate', width:90, sorttype:"date"},
+                {name:'name',index:'name', width:100},
+                {name:'amount',index:'amount', width:80, align:"right",sorttype:"float"},
+                {name:'tax',index:'tax', width:80, align:"right",sorttype:"float"},
+                {name:'total',index:'total', width:80,align:"right",sorttype:"float"},
+                {name:'note',index:'note', width:150, sortable:false}
+            ],
+            multiselect: true,
+            caption: "Manipulating Array Data"
+            });
+            var mydata = [
+                {id:"1",invdate:"2007-10-01",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+                {id:"2",invdate:"2007-10-02",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+                {id:"3",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
+                {id:"4",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+                {id:"5",invdate:"2007-10-05",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+                {id:"6",invdate:"2007-09-06",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
+                {id:"7",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+                {id:"8",invdate:"2007-10-03",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+                {id:"9",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"}
+                ];
+            for(var i=0;i<=mydata.length;i++)
+            jQuery("#list4").jqGrid('addRowData',i+1,mydata[i]);
+        }
+
+        function createMap() {
+            var mapBox = {};
+            var keyHolder = [];
+            var myGrid = $('#list4');
+            var selectedRow = myGrid.jqGrid ('getGridParam', 'selarrrow');
+            var selectedId = myGrid.jqGrid ().getDataIDs();
+            var selectedRowData = myGrid.jqGrid ().getRowData();
+
+            for( i = 0; i < selectedRow.length ; i++) {
+                var cellValue = myGrid.jqGrid ('getCell', i+1, 'total');
+                keyHolder.push(myGrid.jqGrid ('getCell', i+1, 'total'));
+            }
+            var counts = {};
+            // keyHolder.forEach(function(x) { counts[x] = (counts[x] || 0)+1; });
+            for(var i = 0; i< keyHolder.length; i++) {
+                var num = keyHolder[i];
+                counts[num] = counts[num] ? counts[num]+1 : 1;
+            }
+
+            var cont = [];
+            for(var i in counts){
+                var key = Object.keys(counts);
+                // console.log(key);
+                if (!mapBox[key]) {
+                    mapBox[key] = [];
+                }
+                cont.push(key);
+                mapBox[key].push(counts[i]);
+            }
+            var map = {};
+            var a =[];
+            for(var i in selectedRowData){
+                map[selectedRowData[i].total] = "";//selectedRowData[i].id;
+                a.push(selectedRowData[i].id);
+                console.log(a);
+                map[selectedRowData[i].total] = a;
+                a.push(map[selectedRowData[i].total])
+                if(map[selectedRowData[i].total] === undefined)  {
+                    a = [];
+
+                }
+            }
+            console.log("cont :", cont[0]);
+            console.log("counts :", counts);
+            console.log("mapBox :", mapBox);
+            console.log("keyHolder :", keyHolder);
+            console.log("selectedRow :", selectedRow);
+            console.log("selectedId :", selectedId);
+            console.log("selectedRowData :", selectedRowData);
+            console.log("map :", map);
+        }
+
+
+        function getCopyData(array){
+            var copyDataRow = '';
+            for (var item in array) {
+                copyDataRow += array[item] + '\t';
+            }
+            return copyDataRow + '\r\n'
+        }
+
+
+
+        function JSONToCSVConvertor(JSONData) {
+            var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+                var header = "";
+                var copyDataRow = '';
+                var copyData = '';
+                var copyDataArray = [];
+                var dupId = '';
+                aCount = {};
+                bCount = {};
+                var myGridB = $('#list4');
+                var selRowIdB = myGridB.jqGrid ('getGridParam', 'selrow');
+                var aSelectedElements =  myGrid.jqGrid ('getCell', selRowId, 'client');
+
+                var myGrid = $('#listb');
+                selRowId = myGrid.jqGrid ('getGridParam', 'selrow');
+                var bSelectedElements =  myGrid.jqGrid ('getCell', selRowId, 'client');
+
+
+                for( var i = 0, len=aSelectedElements; i < len; i++ ) {
+                    aCount[aSelectedElements[i]] = aCount[aSelectedElements[i]] ? aCount[aSelectedElements[i]] + 1 : 1;
+                }
+
+                for( var i = 0, len=bSelectedElements; i < len; i++ ) {
+                    bCount[bSelectedElements[i]] = bCount[bSelectedElements[i]] ? bCount[bSelectedElements[i]] + 1 : 1;
+                }
+
+                for (var index in arrData[0]) {
+                    header += index + '\t';
+                }
+                header = $.trim(header);
+                var resultData = header + '\r\n';
+            if(buttonId = idA) {
+                for (var i  in arrData) {
+                    if(bCount[arrData[i].id] - 1 == 0) {
+                        copyData += getCopyData(arrData[i]);
+                    }else {
+                        copyDataRow = getCopyData(arrData[i]);
+                        for( var index = 0; index < bCount[arrData[i].id]; index++) {
+                            copyData += copyDataRow;
+                        }
+                    }
+                }
+            }else if(buttonId = idB) {
+                copyDataRow = '';
+                if(aCount[arrData[i].id] - 1 == 0) {
+                    copyData += getCopyData(arrData[i]);
+                }else {
+                    if(dupId === arrData[i].id){
+                        continue;
+                    }
+                    for(var index1 in arrData){
+                        if(arrData[i] === arrData[index1]) {
+                            copyDataRow += getCopyData(arrData[index1]);
+                        }
+                    }
+                    dupId = arrData[i].id;
+                    for( var index = 0; index < aCount[arrData[i].id]; index++) {
+                        copyData += copyDataRow;
+                    }
+                }
+            }
+            copyDataArray = copyData.split('\n');
+            copyDataArray = copyDataArray.filter(function(row) {
+                return row !== '';
+            })
+            resultData = header + '\r\n' + copyDataArray.join('\n')
+            return resultData;
+        }
+
+        function getMap(){
+            var selectedRow = myGrid.jqGrid ('getGridParam', 'selarrrow');
+            var map = {};
+            for(var i in selectedRow){
+                map
+            }
+        }
+
+        function showTree() {
+            $('#jstree').jstree();
+            // 7 bind to events triggered on the tree
+            $('#jstree').on("changed.jstree", function (e, data) {
+                console.log(data.selected);
+            });
+            // 8 interact with the tree - either way is OK
+            $('button').on('click', function () {
+                $('#jstree').jstree(true).select_node('child_node_1');
+                $('#jstree').jstree('select_node', 'child_node_1');
+                $.jstree.reference('#jstree').select_node('child_node_1');
+            });
+        }
+
+        var array = [
+                {"Vehicle":"BMW","Date":"30, Jul 2013 09:24 AM","Location":"Hauz Khas, Enclave, New Delhi, Delhi, India","Speed":42},
+                {"Vehicle":"Honda CBR","Date":"30, Jul 2013 12:00 AM","Location":"Military Road,  West Bengal 734013,  India","Speed":0},
+                {"Vehicle":"Honda CBR","Date":"30, Jul 2013 12:00 AM","Location":"Military Road,  West Bengal 734013,  India","Speed":1},
+                {"Vehicle":"Honda CBR","Date":"30, Jul 2013 12:00 AM","Location":"Military Road,  West Bengal 734013,  India","Speed":2},
+                {"Vehicle":"Supra","Date":"30, Jul 2013 07:53 AM","Location":"Sec-45, St. Angel's School, Gurgaon, Haryana, India","Speed":58},
+                {"Vehicle":"Land Cruiser","Date":"30, Jul 2013 09:35 AM","Location":"DLF Phase I, Marble Market, Gurgaon, Haryana, India","Speed":83},
+                {"Vehicle":"Suzuki Swift","Date":"30, Jul 2013 12:02 AM","Location":"Behind Central Bank RO, Ram Krishna Rd by-lane, Siliguri, West Bengal, India","Speed":0},
+                {"Vehicle":"Honda Civic","Date":"30, Jul 2013 12:00 AM","Location":"Behind Central Bank RO, Ram Krishna Rd by-lane, Siliguri, West Bengal, India","Speed":0},
+                {"Vehicle":"Honda Accord","Date":"30, Jul 2013 11:05 AM","Location":"DLF Phase IV, Super Mart 1, Gurgaon, Haryana, India","Speed":71}
+            ]
+
+        function arrayManupulation() {
+            var temp = [];
+            var a = ['foo', 'bar', 'baz'];
+            for(var i in a) {
+                if(i > 1){
+                    a.splice(i);
+                }
+            }
+            var cString = JSONToCSVConvertor(array);
+            arrCString = [];
+            arrCString = cString.split('\n');
+            var found = false;
+            $.each(arrCString, function(i, val) {
+                if (val.indexOf("Honda") >= 0 && i > 1) {
+                    arrCString.splice(i, 2);
+                    found = true;
+                    return false;
+                }
+            });
+            $('#arrayManu').val(arrCString);
+        }
+
+        function JSONToCSVConvertor(JSONData) {
+        //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+        var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+        var CSV = '';
+        for (var i = 0; i < arrData.length; i++) {
+            var row = "";
+            //2nd loop will extract each column and convert it in string comma-seprated
+            for (var index in arrData[i]) {
+                row += '"' + arrData[i][index] + '"\t';
+            }
+            row.slice(0, row.length - 1);
+            //add a line break after each row
+            CSV += row + '\r\n';
+        }
+        if (CSV == '') {
+            alert("Invalid data");
+            return;
+        }
+        // copyTextToClipboard(CSV);
+        //Generate a file name
+        $('textarea#ans').val(CSV);
+        return CSV;
+    }
+
+    </script>
+
+    <div style="margin-top:20px;">
+        <table id="list4"></table>
+    </div>
+
+    <!-- 3 setup a container element -->
+    <div id="jstree">
+      <!-- in this example the tree is populated from inline HTML -->
+      <ul>
+        <li>Root node 1
+          <ul>
+            <li id="child_node_1">Child node 1</li>
+            <li>Child node 2</li>
+          </ul>
+        </li>
+        <li>Root node 2</li>
+      </ul>
+    </div>
+
+    <div style="margin-bottom:5px;">
+        <button type="button" id='atrans' onclick='arrayManupulation()'>transform</button>
+    </div>
+    <div style="margin-bottom:5px;">
+        <button type="button" id='mapper' onclick='createMap()'>maper</button>
+    </div>
+    <div style="margin-bottom:5px;">
+        <textarea id="arrayManu" rows="20" cols="20" style="width:100%;"></textarea>
+    </div>
+}

@@ -1,0 +1,310 @@
+@*
+ * This template takes a single argument, a String containing a
+ * message to display.
+ *@
+
+@(name: String)
+@import common._
+@import helper._
+
+@*
+ * Call the `main` template with two arguments. The first
+ * argument is a `String` with the title of the page, the second
+ * argument is an `Html` object containing the body of the page.
+ *@
+
+
+@main("hi") {
+    @*
+     * Get an `Html` object by calling the built-in Play welcome
+     * template and passing a `String` message.
+     *@
+
+    <script type="text/javascript">
+
+    $(function(){
+        $("#ajaxCallUpload").click(function (e) {
+            var formData = new FormData($("#profileForm")[0]);
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: '@routes.HomeController.upload',
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (result) {
+                    onSuccessUpload(result);
+                },
+                error: function (error) {
+                    onErrorUpload(error)
+                }
+            });
+        });
+        var onSuccessUpload = function (result) {
+            console.log(result);
+        }
+        var onErrorUpload = function (error) {
+            alert("Oops !! Something went wrong.")
+        }
+        var data = $('#txt').val();
+
+        $('button#copyCat').click(function(){
+            if(data == '') {
+                return;
+            }
+            JSONToCSVConvertor(data);
+        });
+
+        $('button#copyTXT').click(function(){
+            var txt = $('#txt').val();
+            if(!txt || txt == '') {
+                return;
+            }
+           copyTextToClipboard(JSONToCSVConvertor(data));
+            $('textarea').val('').focus();
+        });
+
+        $('#sort').click(function(){
+            var lines = [];
+            // var sorted = $('#ans').val().replace(/,"/g, '').replace(/"/g, '').replace(",", '').replace(/\t/g, '').split('\n').sort();
+            var sorted = $('#ans').val().split('\n').sort();
+
+
+            $('#ans').val(sorted);
+            lines.push(sorted);
+            console.log(lines);
+            var output = {};
+            for( var i in lines ) {
+                output[i] = lines[i];
+            }
+            console.log( JSON.stringify(output) );
+            console.log(JSONToCSVConvertor(JSON.stringify(output)));
+        });
+        showGrid();
+
+        document.getElementById('sortbykey').onclick = sortByKey;
+        document.getElementById('sortbyvalue').onclick = sortByValue;
+        arrayKeys();
+    });
+
+    function arrayKeys() {
+          var array1 = ["12_1","12_2","12_3","12_4"];
+          var array2 = ["Step1","Step2","Step3","Step4"];
+          var array3 = [];
+  
+          array1.forEach(function (key,i) {
+              array3[key] = array2[i];
+          });
+          console.log("array one :", array1);
+          console.log("array two :", array2);
+          console.log("array three :", array3);
+          console.log("array three :", array3["12_3"]);
+    }
+    
+    function sortByKey() {
+        var textarea = document.getElementById("ans");
+    	textarea.value = textarea.value.split("\n").sort(function(a, b){
+            if(a != "" && b != ""){
+                return a.split(':')[0].localeCompare(b.split(':')[0])
+            } else {
+                return 0
+            }
+        }).join("\n");
+    }
+
+
+    function sortByValue() {
+        var textarea = document.getElementById("ans");
+    	textarea.value = textarea.value.split("\n").sort(function(a, b){
+            if(a != "" && b != ""){
+                return a.split(':')[1].localeCompare(b.split(':')[1])
+            } else {
+                return 0
+            }
+        }).join("\n");
+    }
+
+    function convert(){
+        $.ajax({
+            type :  "POST",
+            dataType: 'json',
+            url : "@routes.HomeController.convert()",
+                success: function(data){
+                    console.log(data);
+                }
+        });
+    }
+
+    function receiveDataDB(){
+        datas = {
+            "name": "great",
+            "comment" : "times"
+        };
+        $.ajax({
+            type :  "POST",
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            data: { obj : JSON.stringify(datas)},
+            url  :  "@routes.HomeController.receiveDataDB()",
+             success: function(data){
+             	console.log(data);
+             },
+             error: function (xhr, ajaxOptions, thrownError) {
+                 console.log(xhr.responseText);
+             }
+        });
+    }
+
+    function JSONToCSVConvertor(JSONData) {
+        //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+        var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+        var CSV = '';
+        //Set Report title in first row or line
+        //This condition will generate the Label/Header
+        //     var row = "";
+        //     //This loop will extract the label from 1st index of on array
+        //     for (var index in arrData[0]) {
+        //         //Now convert each value to string and comma-seprated
+        //         row += index + '\t';
+        //     }
+        //     row = row.slice(0, -1);
+        //     //append Label row with line break
+        //     CSV += row + '\r\n';
+        // //1st loop is to extract each row
+        for (var i = 0; i < arrData.length; i++) {
+            var row = "";
+            //2nd loop will extract each column and convert it in string comma-seprated
+            for (var index in arrData[i]) {
+                row += '"' + arrData[i][index] + '"\t';
+            }
+            row.slice(0, row.length - 1);
+            //add a line break after each row
+            CSV += row + '\r\n';
+        }
+        if (CSV == '') {
+            alert("Invalid data");
+            return;
+        }
+        // copyTextToClipboard(CSV);
+        //Generate a file name
+        $('textarea#ans').val(CSV);
+        return CSV;
+    }
+
+    function copyTextToClipboard(text) {
+          var textArea = document.createElement("textarea");
+          textArea.value = text;
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'successful' : 'unsuccessful';
+            console.log('Copying text command was ' + msg);
+          } catch (err) {
+            console.log('Oops, unable to copy');
+          }
+          document.body.removeChild(textArea);
+    }
+
+    function showGrid() {
+        jQuery("#list4").jqGrid({
+    	datatype: "local",
+    	height: 250,
+       	colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes'],
+       	colModel:[
+       		{name:'id',index:'id', width:60, sorttype:"int"},
+       		{name:'invdate',index:'invdate', width:90, sorttype:"date"},
+       		{name:'name',index:'name', width:100},
+       		{name:'amount',index:'amount', width:80, align:"right",sorttype:"float"},
+       		{name:'tax',index:'tax', width:80, align:"right",sorttype:"float"},
+       		{name:'total',index:'total', width:80,align:"right",sorttype:"float"},
+       		{name:'note',index:'note', width:150, sortable:false}
+       	],
+       	multiselect: true,
+       	caption: "Manipulating Array Data"
+        });
+        var mydata = [
+    		{id:"1",invdate:"2007-10-01",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+    		{id:"2",invdate:"2007-10-02",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+    		{id:"3",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
+    		{id:"4",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+    		{id:"5",invdate:"2007-10-05",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+    		{id:"6",invdate:"2007-09-06",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
+    		{id:"7",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+    		{id:"8",invdate:"2007-10-03",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+    		{id:"9",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"}
+    		];
+        for(var i=0;i<=mydata.length;i++)
+    	jQuery("#list4").jqGrid('addRowData',i+1,mydata[i]);
+    }
+
+
+    </script>
+    <input type="button" onclick="location.href='@routes.CountController.showGrid';" value="Show grid page" />
+    
+    
+    <div style="margin-bottom : 20px;">
+        @form(action = routes.HomeController.upload, 'id ->"uploadForm", 'target -> "formDestination", 'enctype -> "multipart/form-data") {
+            <iframe name="formDestination" scrolling="no"style="height : 25px; width : 800px; border:none; overflow:hidden;"></iframe>
+            <div>
+                <input type="file" name="file" >
+                <input type="submit" id="submission" name="submit" value="Press to upload file" />
+            </div>
+        }
+    </div>
+    <div style="margin-bottom : 20px;">
+        @form(action = routes.HomeController.receiveDataDB, 'method ->"POST") {
+
+            <div>
+                <input type="text" name="name" >
+                <input type="text" name="comment" >
+                <input type="submit" id="submission" name="submit" value="Form Post" />
+            </div>
+        }
+    </div>
+    <div style="margin-bottom : 20px;">
+        <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
+        <span id="status"></span>
+        <h1 id="finalMsg"></h1>
+        <p id ="loaded_n_total"></p>
+    </div>
+    <div style="margin-bottom : 20px;">
+        @form(action = routes.HomeController.upload, 'id -> "profileForm", 'enctype -> "multipart/form-data") {
+
+            <input type="file" name="file" >
+            <input type="submit" id="ajaxCallUpload" name="submit" value="Upload File"/>
+        }
+    </div>
+
+    <div style="margin-bottom : 20px;">
+        <input id="submit" onclick="receiveDataDB();" type="button" name="receive" value ="receive data db"/>
+    </div>
+    <div style="margin-bottom : 20px;">
+        <input id="convert" onclick="convert()" type="button" name="convert" value ="convert to pdf"/>
+    </div>
+    <div style="margin-bottom : 20px; height: 20; line-height:20;text-align:center">
+        <input id="submit" onclick="window.open('count', 'child', width='400', height='100');" type="button" name="sendData" value ="Open child"/>
+    </div>
+
+    <div class='mydiv'>
+    <textarea id="txt" class='txtarea'>[{"Vehicle":"BMW","Date":"30, Jul 2013 09:24 AM","Location":"Hauz Khas, Enclave, New Delhi, Delhi, India","Speed":42},{"Vehicle":"Honda CBR","Date":"30, Jul 2013 12:00 AM","Location":"Military Road,  West Bengal 734013,  India","Speed":0},{"Vehicle":"Honda CBR","Date":"30, Jul 2013 12:00 AM","Location":"Military Road,  West Bengal 734013,  India","Speed":1},{"Vehicle":"Honda CBR","Date":"30, Jul 2013 12:00 AM","Location":"Military Road,  West Bengal 734013,  India","Speed":2},{"Vehicle":"Supra","Date":"30, Jul 2013 07:53 AM","Location":"Sec-45, St. Angel's School, Gurgaon, Haryana, India","Speed":58},{"Vehicle":"Land Cruiser","Date":"30, Jul 2013 09:35 AM","Location":"DLF Phase I, Marble Market, Gurgaon, Haryana, India","Speed":83},{"Vehicle":"Suzuki Swift","Date":"30, Jul 2013 12:02 AM","Location":"Behind Central Bank RO, Ram Krishna Rd by-lane, Siliguri, West Bengal, India","Speed":0},{"Vehicle":"Honda Civic","Date":"30, Jul 2013 12:00 AM","Location":"Behind Central Bank RO, Ram Krishna Rd by-lane, Siliguri, West Bengal, India","Speed":0},{"Vehicle":"Honda Accord","Date":"30, Jul 2013 11:05 AM","Location":"DLF Phase IV, Super Mart 1, Gurgaon, Haryana, India","Speed":71}]</textarea>
+    <button id="copyCat" class='gen_btn'>Generate File</button>
+    </div>
+
+    <div>
+        <textarea id="ans" rows="20" cols="20" style="width:100%;"></textarea>
+        <button id="sort">Sort File</button>
+    </div>
+
+    <div class="wrap">
+        <input type="text" placeholder="Write some text you want to copy" />
+        <button id="copyTXT">Copy my text</button>
+
+        <textarea  ></textarea>
+    </div>
+    <div>
+        <button type="button" id='sortbykey' onclick='sortByKey()'>Sort by name</button>
+        <button type="button" id='sortbyvalue' onclick='sortByValue()'>Sort by value</button>
+    </div>
+}
