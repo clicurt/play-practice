@@ -1,5 +1,6 @@
 package models;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -18,6 +20,10 @@ import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.BOMInputStream;
+import org.mozilla.intl.chardet.HtmlCharsetDetector;
+import org.mozilla.intl.chardet.nsDetector;
+import org.mozilla.intl.chardet.nsICharsetDetectionObserver;
+import org.mozilla.intl.chardet.nsPSMDetector;
 
 import play.Configuration;
 import play.Logger;
@@ -78,7 +84,9 @@ public class FileModel {
                             File tempFile = File.createTempFile(prefix, suffix);
                             tempFile.deleteOnExit();
                             Logger.info("tempFile {}: ", tempFile);
-                            transform(inputFile, srcEncode, outDir, "SHIFT-JIS", tempFile);
+//                            transform(inputFile, srcEncode, outDir, "SHIFT-JIS", tempFile);
+                            String[] url = {"file:///" + inputFile.getAbsolutePath().replace("\\", "/")};
+                            detectEncoding(url);
                             try( BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(tempFile), "SHIFT-JIS"));
                                     BufferedWriter bw = new BufferedWriter(
                                             new OutputStreamWriter(new FileOutputStream(outDir), "SHIFT-JIS"));){
@@ -135,5 +143,50 @@ public class FileModel {
         bis.close();
         Logger.info("encodeString {} ", encodeString);
         return encodeString;
+    }
+    
+    public static String detectEncoding(String[] srcFile) throws IOException {
+     // Initalize the nsDetector() ;
+        int lang = (srcFile.length == 2) ? Integer.parseInt(srcFile[1]) : nsPSMDetector.ALL ;
+        nsDetector det = new nsDetector(lang) ;
+        // Set an observer...
+        // The Notify() will be called when a matching charset is found.
+        final String[] res = {""};
+        det.Init(new nsICharsetDetectionObserver() {
+                public void Notify(String charset) {
+                    HtmlCharsetDetector.found = true ;
+                    res[0] = charset;
+                }
+        });
+
+        URL url = new URL(srcFile[0]);
+        BufferedInputStream imp = new BufferedInputStream(url.openStream());
+
+        byte[] buf = new byte[1024] ;
+        int len;
+        boolean isDone = false ;
+
+        while( (len=imp.read(buf,0,buf.length)) != -1) {
+            // Check if the stream is only ascii.
+            boolean isAscii = det.isAscii(buf,len);
+            // DoIt if non-ascii and not done yet.
+            if (!isAscii && !isDone) {
+                isDone = det.DoIt(buf,len, false);
+            }
+        }
+        det.DataEnd();
+        if (!isDone) {
+            String prob[] = det.getProbableCharsets() ;
+            for(String pr : prob) {
+                if (pr.contains("SHIFT_JIS")) {
+                    res[0] = "MS932";
+                }
+                if (pr.contains("UTF-8")) {
+                    res[0] = pr;
+                }
+             System.out.println("Probable Charset = " + pr);
+            }
+         }
+        return res[0];
     }
 }

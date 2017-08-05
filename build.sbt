@@ -12,7 +12,8 @@ libraryDependencies ++= Seq(
   javaWs,
   "commons-io" % "commons-io" % "2.5",
   "com.orientechnologies" % "orientdb-core" % "2.2.20",
-  "org.jodconverter" % "jodconverter-core" % "4.0.0-RELEASE"
+  "org.jodconverter" % "jodconverter-core" % "4.0.0-RELEASE",
+  "net.sourceforge.jchardet" % "jchardet" % "1.0"
 )
 
 

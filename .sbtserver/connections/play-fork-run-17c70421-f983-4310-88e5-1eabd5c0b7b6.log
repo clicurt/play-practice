@@ -1,0 +1,5 @@
+New log file opened at Sat Jul 29 20:51:30 GMT+09:00 2017 by 42284@Curtis-Desktop
+Sending msg to client play-fork-run-17c70421-f983-4310-88e5-1eabd5c0b7b6: DetachedLogEvent(LogMessage(debug,sbt server socket logs are in: D:\projects\proDva\.sbtserver\connections\master.log))
+Sending msg to client play-fork-run-17c70421-f983-4310-88e5-1eabd5c0b7b6: DetachedLogEvent(LogMessage(debug,sbt general server logs are in: D:\projects\proDva\.sbtserver\master.log))
+Sending msg to client play-fork-run-17c70421-f983-4310-88e5-1eabd5c0b7b6: DetachedLogEvent(LogMessage(debug,sbt client logs are in: D:\projects\proDva\.sbtserver\connections\play-fork-run-17c70421-f983-4310-88e5-1eabd5c0b7b6.log))
+Reading next message from client.
