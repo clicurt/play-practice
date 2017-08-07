@@ -34,7 +34,7 @@ public class FileModel {
 
     public static void getAll(){
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("name", "mkyong");
+        map.put("name", "blow");
         map.put("age", 29);
     }
     

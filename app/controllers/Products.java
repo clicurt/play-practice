@@ -21,7 +21,7 @@ public class Products extends Controller {
     // formFactory.form(Product.class);
 
     public Result list() {
-        return ok(views.html.products.list.render(Product.findAll()));
+        return TODO;//return ok(views.html.products.list.render(Product.findAll()));
     }
 
     public Result newProduct() {
