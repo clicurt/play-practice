@@ -4319,3 +4319,31 @@ Running task... Cancel: sbt.server.ServerTaskCancellation@4cac2ee4, check cycles
 Total time: 0 s, completed 07-Aug-2017 23:19:04
 > server-post-command-cleanup
 > server-handle-next-server-request
+> {file:/D:/projects/proDva/}root/*:playForkReload
+Evaluating tasks: *:playForkReload
+Running task... Cancel: sbt.server.ServerTaskCancellation@6887b4b8, check cycles: false
+
+Initial source changes: 
+	removed:Set()
+	added: Set()
+	modified: Set()
+Removed products: Set()
+External API changes: API Changes: Set()
+Modified binary dependencies: Set()
+Initial directly invalidated sources: Set()
+
+Sources indirectly invalidated by:
+	product: Set()
+	binary dep: Set()
+	external source: Set()
+All initially invalidated sources: Set()
+
+Copy resource mappings: 
+	(D:\projects\proDva\conf\application.conf,D:\projects\proDva\target\scala-2.11\classes\application.conf)
+	(D:\projects\proDva\conf\db.conf,D:\projects\proDva\target\scala-2.11\classes\db.conf)
+	(D:\projects\proDva\conf\logback.xml,D:\projects\proDva\target\scala-2.11\classes\logback.xml)
+	(D:\projects\proDva\conf\play.plugins,D:\projects\proDva\target\scala-2.11\classes\play.plugins)
+	(D:\projects\proDva\conf\routes,D:\projects\proDva\target\scala-2.11\classes\routes)
+Total time: 1 s, completed 07-Aug-2017 23:20:18
+> server-post-command-cleanup
+> server-handle-next-server-request

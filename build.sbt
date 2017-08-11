@@ -19,8 +19,6 @@ libraryDependencies ++= Seq(
   "org.apache.maven.plugins" % "maven-surefire-plugin" % "2.13",
   "org.sonarsource.java" % "sonar-jacoco-listeners" % "3.8" % "test"
 )
-
-
-fork in run := false
-
+jacoco.settings
+parallelExecution in jacoco.Config := false
 fork in run := true
