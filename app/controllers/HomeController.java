@@ -9,6 +9,7 @@ import org.jodconverter.office.OfficeException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import models.FileModel;
+import play.Logger;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http.MultipartFormData;
@@ -51,6 +52,20 @@ public class HomeController extends Controller {
         Map<String, String[]> params = request().body().asFormUrlEncoded();
         String name = params.get("name")[0].toString();
         String comment = params.get("comment")[0].toString();
+
+        return ok(Json.toJson("success: " + name + " " + comment));
+    }
+    
+    public Result getGridData() {
+        String data = "{id:\"1\", invdate:\"2007-10-01\",name:\"test\",note:\"note\",amount:\"200.00\",tax:\"10.00\",total:\"210.00\"}";
+        Logger.info(data);
+        return ok(Json.toJson(data));
+    }
+    
+    public Result editGridData() {
+        Map<String, String[]> params = request().body().asFormUrlEncoded();
+        String name = params.get("names")[0];
+        String comment = params.get("comment")[0];
 
         return ok(Json.toJson("success: " + name + " " + comment));
     }

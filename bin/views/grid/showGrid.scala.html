@@ -13,7 +13,8 @@
             jQuery("#list4").jqGrid({
             datatype: "local",
             height: 250,
-            colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes'],
+            cellEdit : true,
+            colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Nojjjtes'],
             colModel:[
                 {name:'id',index:'id', width:60, sorttype:"int"},
                 {name:'invdate',index:'invdate', width:90, sorttype:"date"},
@@ -23,7 +24,6 @@
                 {name:'total',index:'total', width:80,align:"right",sorttype:"float"},
                 {name:'note',index:'note', width:150, sortable:false}
             ],
-            multiselect: true,
             caption: "Manipulating Array Data"
             });
             var mydata = [

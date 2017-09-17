@@ -7,6 +7,7 @@ GET     /                           controllers.HomeController.index
 # An example controller showing how to use dependency injection
 GET     /count                      controllers.CountController.count
 GET     /showGrid                   controllers.CountController.showGrid()
+GET     /testGrid                   controllers.CountController.testGrid()
 # An example controller showing how to write asynchronous code
 GET     /message                    controllers.AsyncController.message
 
@@ -18,6 +19,7 @@ GET     /products/                  controllers.Products.list()
 GET     /products/new               controllers.Products.newProduct()
 GET     /products/:ean              controllers.Products.show(ean: Long)
 GET     /listProducts               controllers.CountController.listProducts()
+GET     /getGridData                controllers.HomeController.getGridData()
 
 
 
@@ -25,6 +27,8 @@ POST    /upload                     controllers.HomeController.upload()
 POST    /receiveData                controllers.HomeController.receiveData()
 POST    /receiveDataDB              controllers.HomeController.receiveDataDB()
 POST    /convert                    controllers.HomeController.convert()
+POST    /editGridData               controllers.HomeController.editGridData()
+
 
 POST    /products/                  controllers.Products.save()
 

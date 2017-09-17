@@ -1,32 +1,46 @@
-@* showGrid Template File *@
+    @* showGrid Template File *@
 @import common._
 
 @main("Welcome to Play") {
 <script type="text/javascript">
 
-        $(function(){
-            showGrid();
-            showTree();
+        $(function() {
+            $.get("@routes.HomeController.getGridData", function(data, status){
+                showGrid(data);
+                console.log("Data: " + data );
+            });
         });
 
-        function showGrid() {
-            jQuery("#list4").jqGrid({
-            datatype: "local",
-            height: 250,
-            colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes'],
-            colModel:[
-                {name:'id',index:'id', width:60, sorttype:"int"},
-                {name:'invdate',index:'invdate', width:90, sorttype:"date"},
-                {name:'name',index:'name', width:100},
-                {name:'amount',index:'amount', width:80, align:"right",sorttype:"float"},
-                {name:'tax',index:'tax', width:80, align:"right",sorttype:"float"},
-                {name:'total',index:'total', width:80,align:"right",sorttype:"float"},
-                {name:'note',index:'note', width:150, sortable:false}
-            ],
-            multiselect: true,
-            caption: "Manipulating Array Data"
-            });
-            var mydata = [
+        var lastSel;
+        var params = {};
+        params.comment = 'loaf';
+        var editparameters = {
+                keys : true,
+                oneditfunc : function(){
+                    console.log("start edit");
+                },
+                successfunc : function(xhr){
+                    console.log(xhr.responseText);
+                },
+                url : "@routes.HomeController.receiveDataDB",
+                extraparam : params,
+                restoreAfterError : true
+            }
+
+        var saveparameters = {
+                successfunc : function(xhr){
+                    console.log(xhr.responseText);
+                },
+                url : "@routes.HomeController.receiveDataDB",
+                extraparam : params,
+                aftersavefunc : function(){
+                    console.log('saved');
+                },
+                errorfunc: null,
+                afterrestorefunc : null,
+                restoreAfterError : true
+            }
+        var mydata = [
                 {id:"1",invdate:"2007-10-01",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
                 {id:"2",invdate:"2007-10-02",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
                 {id:"3",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
@@ -36,250 +50,183 @@
                 {id:"7",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
                 {id:"8",invdate:"2007-10-03",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
                 {id:"9",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"}
-                ];
-            for(var i=0;i<=mydata.length;i++)
-            jQuery("#list4").jqGrid('addRowData',i+1,mydata[i]);
-        }
+        ],
+        myDelOptions = {
+            // because I use "local" data I don't want to send the changes to the server
+            // so I use "processing:true" setting and delete the row manually in onclickSubmit
+            onclickSubmit: function (rp_ge, rowid) {
+                // reset the value of processing option to true to
+                // skip the ajax request to 'clientArray'.
+                rp_ge.processing = true;
 
-        function createMap() {
-            var mapBox = {};
-            var keyHolder = [];
-            var myGrid = $('#list4');
-            var selectedRow = myGrid.jqGrid ('getGridParam', 'selarrrow');
-            var selectedId = myGrid.jqGrid ().getDataIDs();
-            var selectedRowData = myGrid.jqGrid ().getRowData();
+                // we can use onclickSubmit function as "onclick" on "Delete" button
+                // delete row
+                var grid = $('#list4');
+                grid.jqGrid('delRowData', rowid);
+                $("#delmod" + grid[0].id).hide();
 
-            for( i = 0; i < selectedRow.length ; i++) {
-                var cellValue = myGrid.jqGrid ('getCell', i+1, 'total');
-                keyHolder.push(myGrid.jqGrid ('getCell', i+1, 'total'));
-            }
-            var counts = {};
-            // keyHolder.forEach(function(x) { counts[x] = (counts[x] || 0)+1; });
-            for(var i = 0; i< keyHolder.length; i++) {
-                var num = keyHolder[i];
-                counts[num] = counts[num] ? counts[num]+1 : 1;
-            }
-
-            var cont = [];
-            for(var i in counts){
-                var key = Object.keys(counts);
-                // console.log(key);
-                if (!mapBox[key]) {
-                    mapBox[key] = [];
-                }
-                cont.push(key);
-                mapBox[key].push(counts[i]);
-            }
-            var map = {};
-            var a =[];
-            for(var i in selectedRowData){
-                map[selectedRowData[i].total] = "";//selectedRowData[i].id;
-                a.push(selectedRowData[i].id);
-                console.log(a);
-                map[selectedRowData[i].total] = a;
-                a.push(map[selectedRowData[i].total])
-                if(map[selectedRowData[i].total] === undefined)  {
-                    a = [];
-
-                }
-            }
-            console.log("cont :", cont[0]);
-            console.log("counts :", counts);
-            console.log("mapBox :", mapBox);
-            console.log("keyHolder :", keyHolder);
-            console.log("selectedRow :", selectedRow);
-            console.log("selectedId :", selectedId);
-            console.log("selectedRowData :", selectedRowData);
-            console.log("map :", map);
-        }
-
-
-        function getCopyData(array){
-            var copyDataRow = '';
-            for (var item in array) {
-                copyDataRow += array[item] + '\t';
-            }
-            return copyDataRow + '\r\n'
-        }
-
-
-
-        function JSONToCSVConvertor(JSONData) {
-            var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
-                var header = "";
-                var copyDataRow = '';
-                var copyData = '';
-                var copyDataArray = [];
-                var dupId = '';
-                aCount = {};
-                bCount = {};
-                var myGridB = $('#list4');
-                var selRowIdB = myGridB.jqGrid ('getGridParam', 'selrow');
-                var aSelectedElements =  myGrid.jqGrid ('getCell', selRowId, 'client');
-
-                var myGrid = $('#listb');
-                selRowId = myGrid.jqGrid ('getGridParam', 'selrow');
-                var bSelectedElements =  myGrid.jqGrid ('getCell', selRowId, 'client');
-
-
-                for( var i = 0, len=aSelectedElements; i < len; i++ ) {
-                    aCount[aSelectedElements[i]] = aCount[aSelectedElements[i]] ? aCount[aSelectedElements[i]] + 1 : 1;
+                if (grid[0].p.lastpage > 1) {
+                    // reload grid to make the row from the next page visable.
+                    // TODO: deleting the last row from the last page which number is higher as 1
+                    grid.trigger("reloadGrid", [{ page: grid[0].p.page}]);
                 }
 
-                for( var i = 0, len=bSelectedElements; i < len; i++ ) {
-                    bCount[bSelectedElements[i]] = bCount[bSelectedElements[i]] ? bCount[bSelectedElements[i]] + 1 : 1;
-                }
+                return true;
+            },
+            processing: true
+        },
+        myEditOptions = {
+            // because I use "local" data I don't want to send the changes to the server
+            // so I use "processing:true" setting and delete the row manually in onclickSubmit
+            onclickSubmit: function (rp_ge, rowid) {
+            //     // reset the value of processing option to true to
+            //     // skip the ajax request to 'clientArray'.
+                rp_ge.processing = true;
+            //
+            //     // we can use onclickSubmit function as "onclick" on "Delete" button
+            //     // delete row
+                // var $self = $('#list4');
+                var grid = $('#list4');
+                grid.jqGrid("saveRow", rowid, saveparameters);
+                // var $self = $('#list4'),
+            //     // savedRows array is not empty if some row is in inline editing mode
+                // savedRows = $self.jqGrid("getGridParam", "savedRow");
+                // if (savedRows.length > 0) {
+                //     $self.jqGrid("restoreRow", savedRows[0].id);
+                // }
+                // $self.jqGrid("editRow", rowid, editparameters);
+                console.log('Used');
 
-                for (var index in arrData[0]) {
-                    header += index + '\t';
-                }
-                header = $.trim(header);
-                var resultData = header + '\r\n';
-            if(buttonId = idA) {
-                for (var i  in arrData) {
-                    if(bCount[arrData[i].id] - 1 == 0) {
-                        copyData += getCopyData(arrData[i]);
-                    }else {
-                        copyDataRow = getCopyData(arrData[i]);
-                        for( var index = 0; index < bCount[arrData[i].id]; index++) {
-                            copyData += copyDataRow;
-                        }
+                return true;
+            },
+            processing: true
+        };
+        // function SaveStudentEvaluation(index) {
+        //     saveparameters = {
+        //         "successfunc": null,
+        //         "url": null,
+        //         "extraparam": {},
+        //         "aftersavefunc": null,
+        //         "errorfunc": null,
+        //         "afterrestorefunc": null,
+        //         "restoreAfterError": true,
+        //         "mtype": "POST"
+        //       }
+        // }
+
+        // var orgRowActions = $.fn.fmatter.rowactions;
+        //    $.fn.fmatter.rowactions = function (e, act) {
+        //        var $grid = $(this).closest("table.ui-jqgrid-btable"),
+        //            rowid = $(this).closest("tr.jqgrow").attr("id");
+        //        if (act === "edit") {
+        //            $grid.jqGrid("viewGridRow", rowid);
+        //         //    $grid.jqGrid('editRow', rowid, editparameters);
+        //            return false;
+        //        }
+        //        return orgRowActions.call(this, e, act);
+        //    }
+        function showGrid() {
+            var postData = {};
+            postData.time = "travel";
+            postData.ring = "loard";
+            jQuery("#list4").jqGrid({
+                datatype: "local",
+                pager: "#jqGridPager",
+                height: 250,
+                colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes', 'Actions'],
+                colModel:[
+                    {name:'id',index:'id', width:60, sorttype:"int", editable:true},
+                    {name:'invdate',index:'invdate', width:90, sorttype:"date", editable:true},
+                    {name:'name',index:'name', width:100, editable:true},
+                    {name:'amount',index:'amount', width:80, align:"right",sorttype:"float", editable:true},
+                    {name:'tax',index:'tax', width:80, align:"right",sorttype:"float", editable:true},
+                    {name:'total',index:'total', width:80,align:"right",sorttype:"float", editable:true},
+                    {name:'note',index:'note', width:150, sortable:false, editable:true},
+                    {name:'act',index:'act', width:75,sortable:false, formatter: buttonFormat,
+                        formatoptions : {
+                            keys : true,
+                            delOptions : myEditOptions,
+                            // editOptions : this.beforeSubmitCell,
+                            editbutton : true,
+                            delbutton : true
+                        },
+                        // editoptions : { dataEvents: [{type: 'click', data: { comment: "comment" }, fn: function(e) { console.log(e.data.i); }}, {type: 'keypress', fn: function(e) { console.log('keypress'); } }]}
+                    //     editoptions: {
+                    //       custom_element: function(value, options) {
+                    //           var val = $(value);
+                    //           var elem = $('<div id="'+options.id+'"/>');
+                    //           setTimeout(function(){
+                    //               elem.raty({
+                    //                   path:'http://www.ok-soft-gmbh.com/jquery.raty/1.0.1/img/',
+                    //                   start:(val.length>1? val[1].innerText: value)
+                    //               });
+                    //           }, 100);
+                    //           return elem[0];
+                    //       },
+                    //       custom_value: function(elem) {
+                    //           return elem.find("input").val();
+                    //       }
+                    //   }
                     }
-                }
-            }else if(buttonId = idB) {
-                copyDataRow = '';
-                if(aCount[arrData[i].id] - 1 == 0) {
-                    copyData += getCopyData(arrData[i]);
-                }else {
-                    if(dupId === arrData[i].id){
-                        continue;
-                    }
-                    for(var index1 in arrData){
-                        if(arrData[i] === arrData[index1]) {
-                            copyDataRow += getCopyData(arrData[index1]);
-                        }
-                    }
-                    dupId = arrData[i].id;
-                    for( var index = 0; index < aCount[arrData[i].id]; index++) {
-                        copyData += copyDataRow;
-                    }
-                }
-            }
-            copyDataArray = copyData.split('\n');
-            copyDataArray = copyDataArray.filter(function(row) {
-                return row !== '';
-            })
-            resultData = header + '\r\n' + copyDataArray.join('\n')
-            return resultData;
-        }
-
-        function getMap(){
-            var selectedRow = myGrid.jqGrid ('getGridParam', 'selarrrow');
-            var map = {};
-            for(var i in selectedRow){
-                map
-            }
-        }
-
-        function showTree() {
-            $('#jstree').jstree();
-            // 7 bind to events triggered on the tree
-            $('#jstree').on("changed.jstree", function (e, data) {
-                console.log(data.selected);
+                ],
+                viewrecords: true,
+                // ajaxRowOptions: { contentType: "application/json", dataType: "json" },
+                // serializeRowData: function (data) { return JSON.stringify(data); },
+                caption: "Manipulating Array Data",
+                onSelectRow: function(rowid){
+//                    var $self = $(this),
+//                    // savedRows array is not empty if some row is in inline editing mode
+//                    savedRows = $self.jqGrid("getGridParam", "savedRow");
+//                    if (savedRows.length > 0) {
+//                        $self.jqGrid("restoreRow", savedRows[0].id);
+//                    }
+//                    $self.jqGrid("editRow", rowid, editparameters);
+                },
+                gridComplete: function(){
+                },
+                editurl: "@routes.HomeController.receiveDataDB",
+                // cellEdit : true,
+                // cellsubmit : 'remote',
+                // cellurl : '@routes.HomeController.receiveDataDB',
+                // beforeSubmitCell : function(rowid,celname,value,iRow,iCol) {
+                //   if( rowid == 1 ) {
+                //     return {comment:"value1"}
+                //   } else{
+                //     return {}
+                //   }
+                // }
             });
-            // 8 interact with the tree - either way is OK
-            $('button').on('click', function () {
-                $('#jstree').jstree(true).select_node('child_node_1');
-                $('#jstree').jstree('select_node', 'child_node_1');
-                $.jstree.reference('#jstree').select_node('child_node_1');
-            });
-        }
-
-        var array = [
-                {"Vehicle":"BMW","Date":"30, Jul 2013 09:24 AM","Location":"Hauz Khas, Enclave, New Delhi, Delhi, India","Speed":42},
-                {"Vehicle":"Honda CBR","Date":"30, Jul 2013 12:00 AM","Location":"Military Road,  West Bengal 734013,  India","Speed":0},
-                {"Vehicle":"Honda CBR","Date":"30, Jul 2013 12:00 AM","Location":"Military Road,  West Bengal 734013,  India","Speed":1},
-                {"Vehicle":"Honda CBR","Date":"30, Jul 2013 12:00 AM","Location":"Military Road,  West Bengal 734013,  India","Speed":2},
-                {"Vehicle":"Supra","Date":"30, Jul 2013 07:53 AM","Location":"Sec-45, St. Angel's School, Gurgaon, Haryana, India","Speed":58},
-                {"Vehicle":"Land Cruiser","Date":"30, Jul 2013 09:35 AM","Location":"DLF Phase I, Marble Market, Gurgaon, Haryana, India","Speed":83},
-                {"Vehicle":"Suzuki Swift","Date":"30, Jul 2013 12:02 AM","Location":"Behind Central Bank RO, Ram Krishna Rd by-lane, Siliguri, West Bengal, India","Speed":0},
-                {"Vehicle":"Honda Civic","Date":"30, Jul 2013 12:00 AM","Location":"Behind Central Bank RO, Ram Krishna Rd by-lane, Siliguri, West Bengal, India","Speed":0},
-                {"Vehicle":"Honda Accord","Date":"30, Jul 2013 11:05 AM","Location":"DLF Phase IV, Super Mart 1, Gurgaon, Haryana, India","Speed":71}
-            ]
-
-        function arrayManupulation() {
-            var temp = [];
-            var a = ['foo', 'bar', 'baz'];
-            for(var i in a) {
-                if(i > 1){
-                    a.splice(i);
-                }
+            for(var i=0;i<=mydata.length;i++) {
+                $("#list4").jqGrid('addRowData',i+1,mydata[i]);
             }
-            var cString = JSONToCSVConvertor(array);
-            arrCString = [];
-            arrCString = cString.split('\n');
-            var found = false;
-            $.each(arrCString, function(i, val) {
-                if (val.indexOf("Honda") >= 0 && i > 1) {
-                    arrCString.splice(i, 2);
-                    found = true;
-                    return false;
+            $.extend(true, $.jgrid.inlineEdit, {
+                beforeSaveRow: function (option, rowId) {
+                    option.oneditfunc = function(){
+                        console.log("start edit");
+                    },
+                    option.successfunc = function(xhr){
+                        console.log(xhr.responseText);
+                    },
+                    option.url = "@routes.HomeController.receiveDataDB",
+                    option.extraparam = params,
+                    option.restoreAfterError = true
                 }
             });
-            $('#arrayManu').val(arrCString);
-        }
+     }
 
-        function JSONToCSVConvertor(JSONData) {
-        //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
-        var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
-        var CSV = '';
-        for (var i = 0; i < arrData.length; i++) {
-            var row = "";
-            //2nd loop will extract each column and convert it in string comma-seprated
-            for (var index in arrData[i]) {
-                row += '"' + arrData[i][index] + '"\t';
-            }
-            row.slice(0, row.length - 1);
-            //add a line break after each row
-            CSV += row + '\r\n';
+        function buttonFormat( cellvalue, options, rowObject ){
+            be = "<input style='height:22px;width:20px;' type='button' value='E' onclick=\"jQuery('#list4').jqGrid('editRow', '"+options.rowId+"');\"  />";
+            se = "<input style='height:22px;width:20px;' type='button' id='saveId' value='S' onclick=\"jQuery('#list4').jqGrid('saveRow', '"+options.rowId+"');\"/>";
+            ce = "<input style='height:22px;width:20px;' type='button' value='C' onclick=\"jQuery('#list4').restoreRow('"+options.rowId+"');\" />";
+            return be + se + ce;
         }
-        if (CSV == '') {
-            alert("Invalid data");
-            return;
-        }
-        // copyTextToClipboard(CSV);
-        //Generate a file name
-        $('textarea#ans').val(CSV);
-        return CSV;
-    }
 
     </script>
 
+    <div>
+        <input type="button" onclick="location.href='@routes.CountController.testGrid';" value="test grid page" />
+    </div>
     <div style="margin-top:20px;">
         <table id="list4"></table>
-    </div>
-
-    <!-- 3 setup a container element -->
-    <div id="jstree">
-      <!-- in this example the tree is populated from inline HTML -->
-      <ul>
-        <li>Root node 1
-          <ul>
-            <li id="child_node_1">Child node 1</li>
-            <li>Child node 2</li>
-          </ul>
-        </li>
-        <li>Root node 2</li>
-      </ul>
-    </div>
-
-    <div style="margin-bottom:5px;">
-        <button type="button" id='atrans' onclick='arrayManupulation()'>transform</button>
-    </div>
-    <div style="margin-bottom:5px;">
-        <button type="button" id='mapper' onclick='createMap()'>maper</button>
-    </div>
-    <div style="margin-bottom:5px;">
-        <textarea id="arrayManu" rows="20" cols="20" style="width:100%;"></textarea>
     </div>
 }

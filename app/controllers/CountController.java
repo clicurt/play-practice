@@ -38,6 +38,10 @@ public class CountController extends Controller {
         return ok(views.html.grid.showGrid.render());
     }
 
+    public Result testGrid() {
+        return ok(views.html.grid.testGrid.render());
+    }
+
     public Result listProducts() {
         return ok(views.html.products.list.render(FileModel.map().values()));
     }

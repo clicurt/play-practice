@@ -22,3 +22,5 @@ libraryDependencies ++= Seq(
 jacoco.settings
 parallelExecution in jacoco.Config := false
 fork in run := true
+
+fork in run := true
