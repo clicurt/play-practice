@@ -2,6 +2,7 @@
 @import common._
 
 @main("Welcome to Play") {
+
 <script type="text/javascript">
 
         $(function() {
@@ -10,7 +11,17 @@
                 console.log("Data: " + data );
             });
         });
-
+        
+        var grid = $('#list4');
+        var initRaty = function(rowid) {
+            var rating = grid.getCell(rowid, 8); // the Ranking column has the index 4
+            // because we use rownumbers:true the index of the Ranking column will be 1 higher
+            $('#' + rowid +'> td:nth-child(9) > div').raty({
+                path:'@routes.Assets.versioned("images/raty/")',
+                start:rating,
+                readOnly:true
+            });
+        };
         var lastSel;
         var params = {};
         params.comment = 'loaf';
@@ -41,15 +52,15 @@
                 restoreAfterError : true
             }
         var mydata = [
-                {id:"1",invdate:"2007-10-01",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
-                {id:"2",invdate:"2007-10-02",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
-                {id:"3",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
-                {id:"4",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
-                {id:"5",invdate:"2007-10-05",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
-                {id:"6",invdate:"2007-09-06",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
-                {id:"7",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
-                {id:"8",invdate:"2007-10-03",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
-                {id:"9",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"}
+                {id:"1",invdate:"2007-10-01",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00", rating:"4"},
+                {id:"2",invdate:"2007-10-02",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00", rating:"4"},
+                {id:"3",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00", rating:"3"},
+                {id:"4",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00", rating:"2"},
+                {id:"5",invdate:"2007-10-05",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00", rating:"4"},
+                {id:"6",invdate:"2007-09-06",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00", rating:"5"},
+                {id:"7",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00", rating:"4"},
+                {id:"8",invdate:"2007-10-03",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00", rating:"4"},
+                {id:"9",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00", rating:"4"}
         ],
         myDelOptions = {
             // because I use "local" data I don't want to send the changes to the server
@@ -133,7 +144,7 @@
                 datatype: "local",
                 pager: "#jqGridPager",
                 height: 250,
-                colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes', 'Actions'],
+                colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes', 'Rating', 'Actions'],
                 colModel:[
                     {name:'id',index:'id', width:60, sorttype:"int", editable:true},
                     {name:'invdate',index:'invdate', width:90, sorttype:"date", editable:true},
@@ -142,38 +153,52 @@
                     {name:'tax',index:'tax', width:80, align:"right",sorttype:"float", editable:true},
                     {name:'total',index:'total', width:80,align:"right",sorttype:"float", editable:true},
                     {name:'note',index:'note', width:150, sortable:false, editable:true},
-                    {name:'act',index:'act', width:75,sortable:false, formatter: buttonFormat,
-                        formatoptions : {
-                            keys : true,
-                            delOptions : myEditOptions,
-                            // editOptions : this.beforeSubmitCell,
-                            editbutton : true,
-                            delbutton : true
-                        },
-                        // editoptions : { dataEvents: [{type: 'click', data: { comment: "comment" }, fn: function(e) { console.log(e.data.i); }}, {type: 'keypress', fn: function(e) { console.log('keypress'); } }]}
-                    //     editoptions: {
-                    //       custom_element: function(value, options) {
-                    //           var val = $(value);
-                    //           var elem = $('<div id="'+options.id+'"/>');
-                    //           setTimeout(function(){
-                    //               elem.raty({
-                    //                   path:'http://www.ok-soft-gmbh.com/jquery.raty/1.0.1/img/',
-                    //                   start:(val.length>1? val[1].innerText: value)
-                    //               });
-                    //           }, 100);
-                    //           return elem[0];
-                    //       },
-                    //       custom_value: function(elem) {
-                    //           return elem.find("input").val();
-                    //       }
-                    //   }
-                    }
+                    {name:'rating',index:'rating', width:150, sortable:false, editable:true, title: false,
+                        formatter: function(cellvalue, options, rowObject) {
+                            // insert div needed for the raty plugin
+                            // and insert a hidden span with the rating value
+                            return '<div></div><span style="display: none;">'+cellvalue+'</span>';
+                        }, unformat: function (cellvalue, options, cellobject) {
+                            // get rating value from the hidden span
+                            return cellobject.find("span").text();
+                        }, edittype:'custom', editoptions: {
+                            custom_element: function(value, options) {
+                                var val = $(value);
+                                var elem = $('<div id="'+options.id+'"/>');
+                                setTimeout(function(){
+                                    elem.raty({
+                                        path:'@routes.Assets.versioned("images/raty/")',
+                                        start:(val.length>1? val[1].innerText: value)
+                                    });
+                                }, 100);
+                                return elem[0];
+                            },
+                            custom_value: function(elem) {
+                                return elem.find("input").val();
+                            }
+                        }
+                  },
+                 {name:'act',index:'act', width:75,sortable:false, formatter: buttonFormat
+//                        formatoptions : {
+//                            keys : true,
+//                            delOptions : myEditOptions,
+//                            // editOptions : this.beforeSubmitCell,
+//                            editbutton : true,
+//                            delbutton : true
+//                        },
+                 }
                 ],
                 viewrecords: true,
+                loadComplete: function() {
+                    var ids = grid.getDataIDs();
+                    for(var i=0;i<ids.length;i++){
+                        initRaty(ids[i]);
+                    }
+                },
                 // ajaxRowOptions: { contentType: "application/json", dataType: "json" },
                 // serializeRowData: function (data) { return JSON.stringify(data); },
                 caption: "Manipulating Array Data",
-                onSelectRow: function(rowid){
+                onSelectRow: function(id){
 //                    var $self = $(this),
 //                    // savedRows array is not empty if some row is in inline editing mode
 //                    savedRows = $self.jqGrid("getGridParam", "savedRow");
@@ -181,7 +206,30 @@
 //                        $self.jqGrid("restoreRow", savedRows[0].id);
 //                    }
 //                    $self.jqGrid("editRow", rowid, editparameters);
+                    if (id && id !== lastSel) {
+                        // cancel editing of the previous selected row if it was in editing state.
+                        // jqGrid hold intern savedRow array inside of jqGrid object,
+                        // so it is safe to call restoreRow method with any id parameter
+                        // if jqGrid not in editing state
+                        if (typeof lastSel !== "undefined") {
+                            grid.jqGrid('restoreRow',lastSel);
+                            var cell = $('#' + lastSel +'> td:nth-child(5)');
+                            var spans = cell.find('span');
+                            if (spans.length > 1 ) {
+                                // if the lastSel row was not only selected, but also
+                                // was in editing mode, get the hidden text with the ranking
+                                var rating = cell.find('span')[1].innerText;
+                                cell.find('div').raty({
+                                    path:'@routes.Assets.versioned("images/raty/")',
+                                    start:rating,
+                                    readOnly:true
+                                });
+                            }
+                        }
+                        lastSel = id;
+                    }
                 },
+                rownumbers : true,
                 gridComplete: function(){
                 },
                 editurl: "@routes.HomeController.receiveDataDB",
