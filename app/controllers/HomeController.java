@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.Map;
 
 import org.jodconverter.office.OfficeException;
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import models.FileModel;
 import play.Logger;
+import play.db.DB;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http.MultipartFormData;
@@ -29,6 +31,7 @@ public class HomeController extends Controller {
      * path of <code>/</code>.
      */
     public Result index() {
+        Connection con = DB.getConnection();
         return ok(views.html.index.render("Welcome"));
     }
 
@@ -57,7 +60,7 @@ public class HomeController extends Controller {
     }
     
     public Result getGridData() {
-        String data = "{id:\"1\", invdate:\"2007-10-01\",name:\"test\",note:\"note\",amount:\"200.00\",tax:\"10.00\",total:\"210.00\"}";
+        String data = "{id:\"1\", invdate:\"2007-10-01\",name:\"test\",note:\"note\",amount:\"200.00\",tax:\"10.00\",total:\"210.00\",rating:\"4\"}";
         Logger.info(data);
         return ok(Json.toJson(data));
     }
@@ -76,6 +79,11 @@ public class HomeController extends Controller {
 //       }
         return ok(Json.toJson("Success"));
     }
+    
+//    public Result pTable() {
+//       String searchTerm = request().getQueryString("element");
+//       return ok(Json.toJson(element));
+//    }
 
 //    public static Result getImage(Long id) {
 //        Entity entity = Entity.find.byId(id);

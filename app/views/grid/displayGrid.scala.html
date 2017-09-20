@@ -1,0 +1,101 @@
+@* displayGrid Template File *@
+@import common._
+
+@main("Welcome to Play") {
+    
+<script type="text/javascript">
+    $(function() {
+        $.get("@routes.HomeController.getGridData", function(data, status){
+            showGrid(data);
+            console.log("Data: " + data );
+        });
+    });
+
+
+    var lastSel;
+    var params = {};
+    params.comment = 'loaf';
+    var editparameters = {
+            keys : true,
+            oneditfunc : function(){
+                console.log("start edit");
+            },
+            successfunc : function(xhr){
+                console.log(xhr.responseText);
+            },
+            url : "@routes.HomeController.receiveDataDB",
+            extraparam : params,
+            restoreAfterError : true
+        }
+
+    var saveparameters = {
+            successfunc : function(xhr){
+                console.log(xhr.responseText);
+            },
+            url : "@routes.HomeController.receiveDataDB",
+            extraparam : params,
+            aftersavefunc : function(){
+                console.log('saved');
+            },
+            errorfunc: null,
+            afterrestorefunc : null,
+            restoreAfterError : true
+        }
+    function showGrid(data) {
+        jQuery("#list4").jqGrid({
+            datatype: "local",
+            data : data,
+            pager: "#jqGridPager",
+            height: 250,
+            colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes', 'Actions'],
+            colModel:[
+                {name:'id',index:'id', width:60, sorttype:"int", editable:true},
+                {name:'invdate',index:'invdate', width:90, sorttype:"date", editable:true},
+                {name:'name',index:'name', width:100, editable:true},
+                {name:'amount',index:'amount', width:80, align:"right",sorttype:"float", editable:true},
+                {name:'tax',index:'tax', width:80, align:"right",sorttype:"float", editable:true},
+                {name:'total',index:'total', width:80,align:"right",sorttype:"float", editable:true},
+                {name:'note',index:'note', width:150, sortable:false, editable:true},
+                {name:'act',index:'act', width:75,sortable:false, formatter: buttonFormat}
+            ],
+            viewrecords: true,
+            caption: "Manipulating Array Data",
+            onSelectRow: function(rowid){
+            },
+            gridComplete: function(){
+            },
+        });
+        for(var i=0;i<=mydata.length;i++) {
+            $("#list4").jqGrid('addRowData',i+1,mydata[i]);
+        }
+        $.extend(true, $.jgrid.inlineEdit, {
+            beforeSaveRow: function (option, rowId) {
+                option.oneditfunc = function(){
+                    console.log("start edit");
+                },
+                option.successfunc = function(xhr){
+                    console.log(xhr.responseText);
+                },
+                option.url = "@routes.HomeController.receiveDataDB",
+                option.extraparam = params,
+                option.restoreAfterError = true
+            }
+        });
+ }
+
+    function buttonFormat( cellvalue, options, rowObject ){
+        be = "<input style='height:22px;width:20px;' type='button' value='E' onclick=\"jQuery('#list4').jqGrid('editRow', '"+options.rowId+"');\"  />";
+        se = "<input style='height:22px;width:20px;' type='button' id='saveId' value='S' onclick=\"jQuery('#list4').jqGrid('saveRow', '"+options.rowId+"');\"/>";
+        ce = "<input style='height:22px;width:20px;' type='button' value='C' onclick=\"jQuery('#list4').restoreRow('"+options.rowId+"');\" />";
+        return be + se + ce;
+    }
+
+    </script>
+
+    <div>
+        <input type="button" onclick="location.href='@routes.CountController.testGrid';" value="test grid page" />
+    </div>
+    <div style="margin-top:20px;">
+        <table id="list4"></table>
+    </div>
+}

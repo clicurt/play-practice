@@ -6,143 +6,137 @@
 <script type="text/javascript">
 
         $(function() {
+            var mydata = [
+                    {id:"1",invdate:"2007-10-01",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00", Ranking:"4"},
+                    {id:"2",invdate:"2007-10-02",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00", Ranking:"4"},
+                    {id:"3",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00", Ranking:"3"},
+                    {id:"4",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00", Ranking:"2"},
+                    {id:"5",invdate:"2007-10-05",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00", Ranking:"4"},
+                    {id:"6",invdate:"2007-09-06",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00", Ranking:"5"},
+                    {id:"7",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00", Ranking:"4"},
+                    {id:"8",invdate:"2007-10-03",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00", Ranking:"4"},
+                    {id:"9",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00", Ranking:"4"}
+            ];
+            showGrid(mydata);
             $.get("@routes.HomeController.getGridData", function(data, status){
-                showGrid(data);
+
                 console.log("Data: " + data );
             });
         });
-        
+
         var grid = $('#list4');
-        var initRaty = function(rowid) {
-            var rating = grid.getCell(rowid, 8); // the Ranking column has the index 4
-            // because we use rownumbers:true the index of the Ranking column will be 1 higher
-            $('#' + rowid +'> td:nth-child(9) > div').raty({
-                path:'@routes.Assets.versioned("images/raty/")',
-                start:rating,
-                readOnly:true
-            });
-        };
+
         var lastSel;
         var params = {};
         params.comment = 'loaf';
-        var editparameters = {
-                keys : true,
-                oneditfunc : function(){
-                    console.log("start edit");
-                },
-                successfunc : function(xhr){
-                    console.log(xhr.responseText);
-                },
-                url : "@routes.HomeController.receiveDataDB",
-                extraparam : params,
-                restoreAfterError : true
-            }
+        params.Ranking = "4";
+        // var editparameters = {
+        //         keys : true,
+        //         oneditfunc : function(){
+        //             console.log("start edit");
+        //         },
+        //         successfunc : function(xhr){
+        //             console.log(xhr.responseText);
+        //         },
+        //         url : "@routes.HomeController.receiveDataDB",
+        //         extraparam : params,
+        //         restoreAfterError : true
+        //     }
+        //
+        // var saveparameters = {
+        //         successfunc : function(xhr){
+        //             console.log(xhr.responseText);
+        //         },
+        //         url : "@routes.HomeController.receiveDataDB",
+        //         extraparam : params,
+        //         aftersavefunc : function(){
+        //             console.log('saved');
+        //         },
+        //         errorfunc: null,
+        //         afterrestorefunc : null,
+        //         restoreAfterError : true
+        //     }
 
-        var saveparameters = {
-                successfunc : function(xhr){
-                    console.log(xhr.responseText);
-                },
-                url : "@routes.HomeController.receiveDataDB",
-                extraparam : params,
-                aftersavefunc : function(){
-                    console.log('saved');
-                },
-                errorfunc: null,
-                afterrestorefunc : null,
-                restoreAfterError : true
-            }
-        var mydata = [
-                {id:"1",invdate:"2007-10-01",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00", rating:"4"},
-                {id:"2",invdate:"2007-10-02",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00", rating:"4"},
-                {id:"3",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00", rating:"3"},
-                {id:"4",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00", rating:"2"},
-                {id:"5",invdate:"2007-10-05",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00", rating:"4"},
-                {id:"6",invdate:"2007-09-06",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00", rating:"5"},
-                {id:"7",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00", rating:"4"},
-                {id:"8",invdate:"2007-10-03",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00", rating:"4"},
-                {id:"9",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00", rating:"4"}
-        ],
-        myDelOptions = {
-            // because I use "local" data I don't want to send the changes to the server
-            // so I use "processing:true" setting and delete the row manually in onclickSubmit
-            onclickSubmit: function (rp_ge, rowid) {
-                // reset the value of processing option to true to
-                // skip the ajax request to 'clientArray'.
-                rp_ge.processing = true;
+       myDelOptions = {
+           // because I use "local" data I don't want to send the changes to the server
+           // so I use "processing:true" setting and delete the row manually in onclickSubmit
+           onclickSubmit: function (rp_ge, rowid) {
+               // reset the value of processing option to true to
+               // skip the ajax request to 'clientArray'.
+               rp_ge.processing = true;
 
-                // we can use onclickSubmit function as "onclick" on "Delete" button
-                // delete row
-                var grid = $('#list4');
-                grid.jqGrid('delRowData', rowid);
-                $("#delmod" + grid[0].id).hide();
+               // we can use onclickSubmit function as "onclick" on "Delete" button
+               // delete row
+               var grid = $('#list4');
+               grid.jqGrid('delRowData', rowid);
+               $("#delmod" + grid[0].id).hide();
 
-                if (grid[0].p.lastpage > 1) {
-                    // reload grid to make the row from the next page visable.
-                    // TODO: deleting the last row from the last page which number is higher as 1
-                    grid.trigger("reloadGrid", [{ page: grid[0].p.page}]);
-                }
+               if (grid[0].p.lastpage > 1) {
+                   // reload grid to make the row from the next page visable.
+                   // TODO: deleting the last row from the last page which number is higher as 1
+                   grid.trigger("reloadGrid", [{ page: grid[0].p.page}]);
+               }
 
-                return true;
-            },
-            processing: true
-        },
-        myEditOptions = {
-            // because I use "local" data I don't want to send the changes to the server
-            // so I use "processing:true" setting and delete the row manually in onclickSubmit
-            onclickSubmit: function (rp_ge, rowid) {
-            //     // reset the value of processing option to true to
-            //     // skip the ajax request to 'clientArray'.
-                rp_ge.processing = true;
-            //
-            //     // we can use onclickSubmit function as "onclick" on "Delete" button
-            //     // delete row
-                // var $self = $('#list4');
-                var grid = $('#list4');
-                grid.jqGrid("saveRow", rowid, saveparameters);
-                // var $self = $('#list4'),
-            //     // savedRows array is not empty if some row is in inline editing mode
-                // savedRows = $self.jqGrid("getGridParam", "savedRow");
-                // if (savedRows.length > 0) {
-                //     $self.jqGrid("restoreRow", savedRows[0].id);
-                // }
-                // $self.jqGrid("editRow", rowid, editparameters);
-                console.log('Used');
+               return true;
+           },
+           processing: true
+       },
+       myEditOptions = {
+           // because I use "local" data I don't want to send the changes to the server
+           // so I use "processing:true" setting and delete the row manually in onclickSubmit
+           onclickSubmit: function (rp_ge, rowid) {
+           //     // reset the value of processing option to true to
+           //     // skip the ajax request to 'clientArray'.
+               rp_ge.processing = true;
+           //
+           //     // we can use onclickSubmit function as "onclick" on "Delete" button
+           //     // delete row
+               // var $self = $('#list4');
+               var grid = $('#list4');
+               grid.jqGrid("saveRow", rowid, saveparameters);
+               // var $self = $('#list4'),
+           //     // savedRows array is not empty if some row is in inline editing mode
+               // savedRows = $self.jqGrid("getGridParam", "savedRow");
+               // if (savedRows.length > 0) {
+               //     $self.jqGrid("restoreRow", savedRows[0].id);
+               // }
+               // $self.jqGrid("editRow", rowid, editparameters);
+               console.log('Used');
 
-                return true;
-            },
-            processing: true
-        };
-        // function SaveStudentEvaluation(index) {
-        //     saveparameters = {
-        //         "successfunc": null,
-        //         "url": null,
-        //         "extraparam": {},
-        //         "aftersavefunc": null,
-        //         "errorfunc": null,
-        //         "afterrestorefunc": null,
-        //         "restoreAfterError": true,
-        //         "mtype": "POST"
-        //       }
-        // }
+               return true;
+           },
+           processing: true
+       };
 
-        // var orgRowActions = $.fn.fmatter.rowactions;
-        //    $.fn.fmatter.rowactions = function (e, act) {
-        //        var $grid = $(this).closest("table.ui-jqgrid-btable"),
-        //            rowid = $(this).closest("tr.jqgrow").attr("id");
-        //        if (act === "edit") {
-        //            $grid.jqGrid("viewGridRow", rowid);
-        //         //    $grid.jqGrid('editRow', rowid, editparameters);
-        //            return false;
-        //        }
-        //        return orgRowActions.call(this, e, act);
-        //    }
-        function showGrid() {
+        //  var orgRowActions = $.fn.fmatter.rowactions;
+        //     $.fn.fmatter.rowactions = function (e, act) {
+        //         var $grid = $(this).closest("table.ui-jqgrid-btable"),
+        //             rowid = $(this).closest("tr.jqgrow").attr("id");
+        //         if (act === "edit") {
+        //             $grid.jqGrid("viewGridRow", rowid);
+        //          //    $grid.jqGrid('editRow', rowid, editparameters);
+        //             return false;
+        //         }
+        //         return orgRowActions.call(this, e, act);
+            // }
+
+        function showGrid(data) {
+            var grid = $("#list4");
+            var initRaty = function(rowid) {
+                    var ranking = grid.getCell(rowid, 8); // the Ranking column has the index 4
+                    // because we use rownumbers:true the index of the Ranking column will be 1 higher
+                    $('#' + rowid +'> td:nth-child(9) > div').raty({
+                        path:'@routes.Assets.versioned("images/raty/")',
+                        start:ranking,
+                        readOnly:true
+                    });
+            };
             var postData = {};
             postData.time = "travel";
             postData.ring = "loard";
             jQuery("#list4").jqGrid({
+                data : data,
                 datatype: "local",
-                pager: "#jqGridPager",
                 height: 250,
                 colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes', 'Rating', 'Actions'],
                 colModel:[
@@ -153,7 +147,7 @@
                     {name:'tax',index:'tax', width:80, align:"right",sorttype:"float", editable:true},
                     {name:'total',index:'total', width:80,align:"right",sorttype:"float", editable:true},
                     {name:'note',index:'note', width:150, sortable:false, editable:true},
-                    {name:'rating',index:'rating', width:150, sortable:false, editable:true, title: false,
+                    {name:'Ranking', editable:true, width:100, title: false,
                         formatter: function(cellvalue, options, rowObject) {
                             // insert div needed for the raty plugin
                             // and insert a hidden span with the rating value
@@ -177,23 +171,28 @@
                                 return elem.find("input").val();
                             }
                         }
-                  },
-                 {name:'act',index:'act', width:75,sortable:false, formatter: buttonFormat
-//                        formatoptions : {
-//                            keys : true,
-//                            delOptions : myEditOptions,
-//                            // editOptions : this.beforeSubmitCell,
-//                            editbutton : true,
-//                            delbutton : true
-//                        },
-                 }
+                    },
+                    {name:'act',index:'act', width:75,sortable:false, formatter: buttonFormat
+                    //    formatoptions : {
+                    //        keys : true,
+                    //        delOptions : myDelOptions,
+                    //        // editOptions : this.beforeSubmitCell,
+                    //        editbutton : true,
+                    //        delbutton : true
+                    //    },
+                     }
                 ],
                 viewrecords: true,
+                gridview:true,
                 loadComplete: function() {
                     var ids = grid.getDataIDs();
                     for(var i=0;i<ids.length;i++){
                         initRaty(ids[i]);
                     }
+                },
+                ondblClickRow: function(id, ri, ci) {
+                    // edit the row and save it on press "enter" key
+                    grid.jqGrid('editRow',id,true,null,null, 'clientArray', {}, initRaty);
                 },
                 // ajaxRowOptions: { contentType: "application/json", dataType: "json" },
                 // serializeRowData: function (data) { return JSON.stringify(data); },
@@ -218,10 +217,10 @@
                             if (spans.length > 1 ) {
                                 // if the lastSel row was not only selected, but also
                                 // was in editing mode, get the hidden text with the ranking
-                                var rating = cell.find('span')[1].innerText;
+                                var ranking = cell.find('span')[1].innerText;
                                 cell.find('div').raty({
                                     path:'@routes.Assets.versioned("images/raty/")',
-                                    start:rating,
+                                    start:ranking,
                                     readOnly:true
                                 });
                             }
@@ -231,6 +230,10 @@
                 },
                 rownumbers : true,
                 gridComplete: function(){
+                    var ids = grid.getDataIDs();
+                    for(var i=0;i<ids.length;i++){
+                        initRaty(ids[i]);
+                    }
                 },
                 editurl: "@routes.HomeController.receiveDataDB",
                 // cellEdit : true,
@@ -244,9 +247,9 @@
                 //   }
                 // }
             });
-            for(var i=0;i<=mydata.length;i++) {
-                $("#list4").jqGrid('addRowData',i+1,mydata[i]);
-            }
+            // for(var i=0;i<=data.length;i++) {
+            //     $("#list4").jqGrid('addRowData',i+1,data[i]);
+            // }
             $.extend(true, $.jgrid.inlineEdit, {
                 beforeSaveRow: function (option, rowId) {
                     option.oneditfunc = function(){
@@ -257,17 +260,29 @@
                     },
                     option.url = "@routes.HomeController.receiveDataDB",
                     option.extraparam = params,
+                    option.aftersavefunc = function() {
+                        console.log("saved");
+                    },
+                    option.afterrestorefunc = function() {
+                        $("#list4").trigger("reloadGrid");
+                        console.log("restored");
+                    },
                     option.restoreAfterError = true
                 }
             });
-     }
 
-        function buttonFormat( cellvalue, options, rowObject ){
-            be = "<input style='height:22px;width:20px;' type='button' value='E' onclick=\"jQuery('#list4').jqGrid('editRow', '"+options.rowId+"');\"  />";
-            se = "<input style='height:22px;width:20px;' type='button' id='saveId' value='S' onclick=\"jQuery('#list4').jqGrid('saveRow', '"+options.rowId+"');\"/>";
-            ce = "<input style='height:22px;width:20px;' type='button' value='C' onclick=\"jQuery('#list4').restoreRow('"+options.rowId+"');\" />";
-            return be + se + ce;
-        }
+
+     }
+    function buttonFormat( cellvalue, options, rowObject ){
+        be = "<input style='height:22px;width:20px;' type='button' value='E' onclick=\"$('#list4').jqGrid('editRow', '"+options.rowId+"');\"  />";
+        se = "<input style='height:22px;width:20px;' type='button' value='S' onclick=\"$('#list4').jqGrid('saveRow', '"+options.rowId+"');\" />";
+        ce = "<input style='height:22px;width:20px;' type='button' value='C' onclick=\"$('#list4').jqGrid('restoreRow', '"+options.rowId+"', '"+afterrestorefunc+"');\" />";
+        return be + se + ce;
+    }
+
+    function afterrestorefunc(){
+        $("#list4").trigger("reloadGrid");
+    }
 
     </script>
 

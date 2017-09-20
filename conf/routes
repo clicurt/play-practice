@@ -20,14 +20,27 @@ GET     /products/new               controllers.Products.newProduct()
 GET     /products/:ean              controllers.Products.show(ean: Long)
 GET     /listProducts               controllers.CountController.listProducts()
 GET     /getGridData                controllers.HomeController.getGridData()
-
-
+GET     /template                   controllers.ElementController.template()
+GET     /element                    controllers.ElementController.element()
 
 POST    /upload                     controllers.HomeController.upload()
 POST    /receiveData                controllers.HomeController.receiveData()
 POST    /receiveDataDB              controllers.HomeController.receiveDataDB()
 POST    /convert                    controllers.HomeController.convert()
 POST    /editGridData               controllers.HomeController.editGridData()
+
+#books
+GET     /books                    controllers.BooksController.index()
+GET     /books/create             controllers.BooksController.create()
+GET     /books/:id                controllers.BooksController.show(id : Integer)
+GET     /books/edit/:id           controllers.BooksController.edit(id : Integer)
+POST    /books/edit               controllers.BooksController.update()
+POST    /books/create             controllers.BooksController.save()
+GET     /books/delete/:id         controllers.BooksController.destroy(id : Integer)
+
+#Grid
+#GET     /getGridData              controllers.GridController.getGridData()
+
 
 
 POST    /products/                  controllers.Products.save()
