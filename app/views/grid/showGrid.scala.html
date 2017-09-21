@@ -276,12 +276,13 @@
     function buttonFormat( cellvalue, options, rowObject ){
         be = "<input style='height:22px;width:20px;' type='button' value='E' onclick=\"$('#list4').jqGrid('editRow', '"+options.rowId+"');\"  />";
         se = "<input style='height:22px;width:20px;' type='button' value='S' onclick=\"$('#list4').jqGrid('saveRow', '"+options.rowId+"');\" />";
-        ce = "<input style='height:22px;width:20px;' type='button' value='C' onclick=\"$('#list4').jqGrid('restoreRow', '"+options.rowId+"', '"+afterrestorefunc+"');\" />";
+        ce = "<input style='height:22px;width:20px;' type='button' value='C' onclick=\"$('#list4').jqGrid('restoreRow', '"+options.rowId+"', '"+afterrestorefunc()+"');\" />";
         return be + se + ce;
     }
 
     function afterrestorefunc(){
         $("#list4").trigger("reloadGrid");
+        console.log('was here');
     }
 
     </script>
