@@ -113,7 +113,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <!-- Minimal supported version is 2.4 -->
+            <!-- Minimal supported version is 2.4 now installed-->
             <version>2.13</version>
             <configuration>
               <properties>
